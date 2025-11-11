@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowderSense 2.0 - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%), url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KPGcgZmlsbD0iI2ZmZiIgZmlsbC1vcGFjaXR5PSIwLjAzIj4KPHBhdGggZD0iTTM2IDM0djEwSDI0VjM0aDEyeiIvPgo8L2c+CjwvZz4KPC9zdmc+') repeat;
+            background-size: cover, 60px 60px;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 10px 15px; /* Reduced padding */
+            margin-bottom: 20px; /* Standardized margin */
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 10px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 1.5em; /* Reduced font size */
+            margin: 0; /* Removed margin */
+            text-align: left;
+            flex-shrink: 0;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: flex-end; /* Push status items to the right */
+            align-items: center;
+            flex-wrap: nowrap; /* Prevent status items from wrapping */
+            gap: 10px; /* Reduced gap */
+            overflow-x: auto; /* Allow horizontal scrolling if needed */
+            padding-bottom: 0; 
+            flex-grow: 1; /* Allow status bar to take remaining space */
+        }
+
+        .connection-status {
+            /* Removed fixed positioning to integrate into status-bar */
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px; /* Reduced gap */
+            padding: 5px 10px; /* Reduced padding */
+            background: #ecf0f1;
+            border-radius: 15px;
+            font-weight: 500;
+            font-size: 0.8em; /* Smaller font size */
+            flex-shrink: 0; /* Prevent items from shrinking */
+        }
+
+        .status-item.connection {
+            /* Specific styling for connection status if needed */
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #28a745;
+        }
+
+        .status-indicator.warning {
+            background: #ffc107;
+        }
+
+        .status-indicator.error {
+            background: #dc3545;
+        }
+
+        .uptime-display {
+            font-weight: 500;
+            color: #343a40;
+        }
+
+        /* Main grid for the top row - two separate cards */
+        .top-row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two equal columns */
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* New container for the bottom cards */
+        .bottom-row-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* Ensure single column layout */
+            gap: 20px; /* Standardized gap between cards */
+            margin-bottom: 20px; /* Add margin for spacing below */
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px; /* Reduced card padding */
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+
+        .measurement-display {
+            text-align: center;
+            padding: 10px 0; /* Reduced vertical padding */
+        }
+
+        .current-weight {
+            font-size: 3.0em; /* Reduced font size */
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px; /* Reduced margin */
+        }
+
+        .measurement-unit {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            display: inline;
+        }
+
+        .caliber-info {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+        .caliber-info > strong { /* Top-level strong for config name */
+            font-size: 1.2em;
+            color: #2c3e50;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .caliber-info span {
+            display: block;
+            color: #555;
+            line-height: 1.6;
+            padding-left: 10px;
+        }
+        .caliber-info span strong { /* Nested strong for labels */
+            display: inline;
+            font-size: 1em;
+            color: #34495e;
+            margin-bottom: 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            font-size: 0.75em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .chart-container {
+            height: 300px; /* Fixed height for chart */
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden; /* Prevent overflow */
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: nowrap;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2980b9, #1f5f99);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #229954, #1e8449);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #e67e22, #d68910);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #c0392b, #a93226);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: linear-gradient(135deg, #138496, #117a8b);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Combined alarm/calibration panel */
+        .info-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: none; /* Hidden by default, managed by JS */
+        }
+
+        .info-panel.active {
+            display: block;
+        }
+
+        /* Alarm specific styles (kept for reference, but alarmContent div will be removed) */
+        .info-panel.alarm {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        /* Calibration specific styles */
+        .info-panel.calibration {
+            background: #e0f7fa; /* Light blue background */
+            color: #00796b; /* Dark teal text */
+            border: 2px solid #00bcd4; /* Cyan border */
+        }
+
+        .info-panel h3, .info-panel h4 {
+            color: inherit; /* Inherit color from parent panel */
+            margin-bottom: 15px;
+        }
+
+        .info-panel p {
+            margin-bottom: 15px;
+        }
+
+        .settings-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #3498db;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .current-weight {
+                font-size: 2.5em;
+            }
+
+            .top-row-grid, .bottom-row-grid {
+                /* Revert to single column for small screens */
+                grid-template-columns: 1fr; 
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .status-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Removed fixed connection status styles as it is now integrated into the status bar */
+
+        .chart-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            z-index: 1001;
+        }
+        .notification.show {
+            opacity: 1;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 15px;
+            position: relative;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Grid for thresholds */
+        .thresholds-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .thresholds-grid .form-group {
+            margin-bottom: 0;
+        }
+
+        .measurement-row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>🎯 PowderSense 2.0</h1>
+                <div class="status-bar">
+                    <div class="status-item">
+                        <div class="status-indicator" id="systemStatus"></div>
+                        <span>System Ready</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator" id="wifiStatus"></div>
+                        <span id="wifiStatusText">WiFi Connected</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator" id="sensorStatus"></div>
+                        <span id="sensorStatusText">Sensor Active</span>
+                    </div>
+                    <div class="status-item">
+                        <span id="adcValue">ADC: ----</span>
+                    </div>
+                    <div class="status-item">
+                        <span id="uptimeDisplay">Time: --:--:--</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator" id="connectionIndicator"></div>
+                        <span id="connectionStatusText"><span class="loading"></span> Connecting...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Measurement Row Grid -->
+        <div class="measurement-row-grid">
+            <div class="card">
+                <h3>📏 Current Measurement</h3>
+                <div class="measurement-display">
+                    <div class="current-weight" id="currentWeight">--.--- <span class="measurement-unit">Grains</span></div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>📏 Last Measurement</h3>
+                <div id="lastMeasurementDetails">
+                    <p>No measurements yet</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combined Alarm/Calibration Panel -->
+        <div class="info-panel" id="infoPanel">
+            <!-- Removed alarmContent div -->
+            <div id="calibrationContent" style="display: none;">
+                <h4 id="calibratingConfigName"></h4>
+                <p id="calibrationMessage">Place the probe at its zero (empty) position and click "Set Zero".</p>
+                <div class="form-group" id="knownGrainsInputGroup" style="display: none;">
+                    <label for="knownGrains">Known Powder Weight (grains):</label>
+                    <input type="number" id="knownGrains" step="0.1" value="30.0">
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" id="calibrationStepButton">Set Zero</button>
+                    <button class="btn btn-danger" onclick="cancelCalibration()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="top-row-grid">
+            <!-- Quick Settings Card -->
+            <div class="card">
+                <h4 id="quickSettingsHeader">⚙️ Quick Settings</h4>
+                <div class="form-group">
+                    <label for="configSelect">Powder Configuration:</label>
+                    <select id="configSelect" onchange="selectConfig()">
+                        <option value="-1">-- No Configuration --</option>
+                    </select>
+                </div>
+                <div class="thresholds-grid">
+                    <div class="form-group">
+                        <label for="lowThreshold">Low (gr):</label>
+                        <input type="number" id="lowThreshold" value="0.0" step="0.1" onchange="updateThresholds()">
+                    </div>
+                    <div class="form-group">
+                        <label for="highThreshold">High (gr):</label>
+                        <input type="number" id="highThreshold" value="0.0" step="0.1" onchange="updateThresholds()">
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-success" onclick="openConfigModal()">Add New</button>
+                    <button class="btn btn-primary" onclick="openConfigModal(true)">Edit</button>
+                    <button class="btn btn-danger" onclick="deleteConfig()">Delete</button>
+                    <button class="btn btn-success" id="measureButton" onclick="takeMeasurement()">Measure</button>
+                    <button class="btn btn-warning" id="calibrateButton" onclick="startCalibrationWizard()">Calibrate</button>
+                    <button class="btn btn-danger" id="cancelCalibrateButton" onclick="cancelCalibrate()" style="display: none;">Cancel Calibration</button>
+                </div>
+            </div>
+
+            <!-- Session Statistics Card -->
+            <div class="card">
+                <h4 id="sessionStatsTitle">📊 Session Statistics</h4>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="avgWeight">--.-</div>
+                        <div class="stat-label">Average (gr)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="stdDev">--.-</div>
+                        <div class="stat-label">Standard Deviation (gr)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="minWeight">--.-</div>
+                        <div class="stat-label">Minimum (gr)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="maxWeight">--.-</div>
+                        <div class="stat-label">Maximum (gr)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalMeasurements">0</div>
+                        <div class="stat-label">Total Count</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="sessionMeasurements">0</div>
+                        <div class="stat-label">Session Count</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-success" id="startSessionBtn" onclick="startSession()">Start Session</button>
+                    <button class="btn btn-warning" id="endSessionBtn" onclick="endSession()">End Session</button>
+                    <button class="btn btn-danger" onclick="resetSession()">Reset Session</button>
+                    <button class="btn btn-primary" onclick="exportData()">Export Data</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- New container for the bottom row, spanning all 3 columns -->
+        <div class="bottom-row-grid">
+            <!-- Real-time Chart -->
+            <div class="card">
+                <h3>📈 Real-time Chart</h3>
+                <div class="chart-container">
+                    <div class="chart-placeholder" id="chartPlaceholder">
+                        Real-time measurement chart will appear here
+                    </div>
+                    <canvas id="measurementChart" style="display: none;"></canvas>
+                </div>
+                <div>
+                    <h4>Session Logs <button class="btn btn-primary" onclick="exportSessionLogs()" style="float: right; padding: 4px 8px; font-size: 0.75em;">Export CSV</button></h4>
+                    <div style="max-height: 200px; overflow-y: auto; clear: both;">
+                        <table class="data-table" id="sessionLogsTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Bullets</th>
+                                    <th>Total Weight (gr)</th>
+                                    <th>Duration</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="5">No sessions yet</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Settings -->
+            <div class="card">
+                <h3>🔧 Advanced Settings</h3>
+                <div>
+                    <h4>System Information</h4>
+                    <table class="data-table">
+                        <tr><td>Device Model:</td><td id="deviceModel">ESP32</td></tr>
+                        <tr><td>Firmware Version:</td><td>v2.0</td></tr>
+                        <tr><td>Free Memory:</td><td id="freeMemory">-- KB</td></tr>
+                        <tr><td>WiFi Signal:</td><td id="wifiSignal">-- dBm</td></tr>
+                        <tr><td>IP Address:</td><td id="ipAddress">---.---.---.---</td></tr>
+                    </table>
+                </div>
+                <div>
+                    <h4>Recent Measurements</h4>
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        <table class="data-table" id="recentMeasurements">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Weight (gr)</th>
+                                    <th>Configuration</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="4">No measurements yet</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="exportConfigs()">Export Configurations</button>
+                    <input type="file" id="importConfigsInput" accept=".json" style="display: none;" onchange="importConfigs()">
+                    <button class="btn btn-success" onclick="document.getElementById('importConfigsInput').click()">Import Configurations</button>
+                    <input type="file" id="firmwareUpdateInput" accept=".bin" style="display: none;" onchange="handleFirmwareUpdate()">
+                    <button class="btn btn-warning" onclick="document.getElementById('firmwareUpdateInput').click()">Update Firmware</button>
+                    <input type="file" id="filesystemUpdateInput" accept=".bin" style="display: none;" onchange="handleFilesystemUpdate()">
+                    <button class="btn btn-info" onclick="document.getElementById('filesystemUpdateInput').click()">Update Filesystem</button>
+                    <button class="btn btn-primary" onclick="downloadLogs()">Download Logs</button>
+                    <button class="btn btn-danger" onclick="factoryReset()">Factory Reset</button>
+                </div>
+                <div id="updateProgress" style="display: none; margin-top: 10px;">
+                    <div style="background: #f0f0f0; border-radius: 5px; height: 20px; overflow: hidden;">
+                        <div id="progressBar" style="background: #3498db; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                    <p id="progressText" style="text-align: center; margin-top: 5px;">Uploading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; color: #7f8c8d; font-size: 0.9em;">
+        Design by Processware &copy; 2025
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <!-- Config Modal -->
+    <div id="configModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeConfigModal()">&times;</span>
+            <h3 id="configModalTitle">Add New Configuration</h3>
+            <form id="configForm">
+                <input type="hidden" id="configIndex" value="-1">
+                <div class="form-group" style="display: none;">
+                    <label for="configName">Configuration Name:</label>
+                    <input type="text" id="configName" required placeholder="e.g., 9mm 115gr SP8">
+                </div>
+                <div class="form-group">
+                    <label for="configCaliber">Caliber:</label>
+                    <input type="text" id="configCaliber" oninput="generateConfigName()" required placeholder="e.g., 9mm Luger">
+                </div>
+                <div class="form-group">
+                    <label for="configBulletWeight">Bullet Weight:</label>
+                    <input type="text" id="configBulletWeight" oninput="generateConfigName()" required placeholder="e.g., 115gr">
+                </div>
+                <div class="form-group">
+                    <label for="configPowderName">Powder Name:</label>
+                    <input type="text" id="configPowderName" oninput="generateConfigName()" required placeholder="e.g., Vectan SP8">
+                </div>
+                <div class="form-group">
+                    <label for="configTargetGrain">Target Grain:</label>
+                    <input type="number" id="configTargetGrain" step="0.1" required placeholder="e.g., 4.5">
+                </div>
+                <div class="controls">
+                    <button type="submit" class="btn btn-primary">Save Configuration</button>
+                    <button type="button" class="btn btn-danger" onclick="closeConfigModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let websocket = null;
+        let isConnected = false;
+        let measurementData = [];
+        let chart = null;
+        let notificationTimeout;
+        let currentCalState = 0; // 0: NONE, 1: ZERO_STEP, 2: KNOWN_GRAINS_STEP
+        window.currentState = {}; // Store the last received state from the device
+
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeWebSocket();
+            updateConnectionStatus();
+            setInterval(updateUptime, 1000);
+
+            // Add event listener for the config form
+            document.getElementById('configForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                saveConfig();
+            });
+        });
+
+        // WebSocket connection management
+        function initializeWebSocket() {
+            // Connect to the ESP32 WebSocket server
+            // The host is injected by the Flask development server or defaults to window.location.hostname
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Use the injected host from Flask, or fallback to the current host if not injected (i.e., running on ESP32)
+            // Note: Flask injects {{ esp32_host }} when running locally.
+            const injectedHost = '{{ esp32_host }}';
+            // If the injectedHost is still the literal template string, use the current hostname (i.e., running on ESP32)
+            const defaultHost = (injectedHost.indexOf('esp32_host') !== -1) ? window.location.hostname : injectedHost;
+            const esp32Host = urlParams.get('esp32_host') || defaultHost;
+            
+            const wsUrl = `ws://${esp32Host}:81/ws`;
+
+            websocket = new WebSocket(wsUrl);
+            
+            websocket.onopen = function(event) {
+                console.log('WebSocket connected');
+                isConnected = true;
+                updateConnectionStatus();
+                showNotification('Connected to device!', 'success');
+            };
+            
+            websocket.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    // Check for update status messages
+                    if (data.updateStatus) {
+                        handleUpdateStatus(data.updateStatus);
+                    } else {
+                        updateDashboard(data); // This will now handle updating currentCalState and then updateInfoPanel/updateCalibrateUI
+                    }
+                } catch (error) {
+                    console.error('Error parsing WebSocket message:', error);
+                }
+            };
+            
+            websocket.onclose = function(event) {
+                console.log('WebSocket disconnected');
+                isConnected = false;
+                updateConnectionStatus();
+                showNotification('Disconnected from device. Reconnecting...', 'error');
+                
+                // Attempt to reconnect after 3 seconds
+                setTimeout(initializeWebSocket, 3000);
+            };
+            
+            websocket.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                isConnected = false;
+                updateConnectionStatus();
+                showNotification('WebSocket error! Reconnecting...', 'error');
+            };
+        }
+
+        // Update dashboard with new data
+        function updateDashboard(data) {
+            window.currentState = data; // Store the latest data globally
+
+            // Update ADC value in header
+            if (data.currentAdc !== undefined) {
+                document.getElementById('adcValue').textContent = `ADC: ${Math.round(data.currentAdc)}`;
+            }
+
+            // Update current measurement
+            document.getElementById('currentWeight').innerHTML = data.currentWeight.toFixed(3) + ' <span class="measurement-unit">Grains</span>';
+
+            // Update config-related info
+            const calibrateButton = document.getElementById('calibrateButton');
+            const configDetailsDiv = document.getElementById('configDetails');
+            const quickSettingsHeader = document.getElementById('quickSettingsHeader');
+
+            if (data.currentConfig) {
+                const config = data.currentConfig;
+                let calStatusText = data.isCalibrated ? ' (Calibrated)' : ' (Not Calibrated)';
+                let calStatusColor = data.isCalibrated ? 'green' : 'orange';
+
+                quickSettingsHeader.innerHTML = `⚙️ Quick Settings <span style="color: ${calStatusColor};">${calStatusText}</span>`;
+
+                if (configDetailsDiv) {
+                    configDetailsDiv.innerHTML = `
+                        <span><strong>Caliber:</strong> ${config.caliber}</span>
+                        <span><strong>Bullet:</strong> ${config.bulletWeight}</span>
+                        <span><strong>Powder:</strong> ${config.powderName}</span>
+                        <span><strong>Target:</strong> ${config.targetGrain.toFixed(2)} gr</span>
+                    `;
+                }
+
+                calibrateButton.removeAttribute('disabled');
+                calibrateButton.title = 'Calibrate the selected powder configuration';
+            } else {
+                quickSettingsHeader.textContent = '⚙️ Quick Settings';
+                if (configDetailsDiv) {
+                    configDetailsDiv.innerHTML = `
+                        <span><strong>Caliber:</strong> --</span>
+                        <span><strong>Bullet:</strong> --</span>
+                        <span><strong>Powder:</strong> --</span>
+                        <span><strong>Target:</strong> -- gr</span>
+                    `;
+                }
+                calibrateButton.setAttribute('disabled', 'disabled');
+                calibrateButton.title = 'Select a configuration to enable calibration';
+            }
+            
+            // Update statistics
+            if (data.stats) {
+                const sessionMeasurements = data.stats.sessionMeasurements;
+                const startSessionBtn = document.getElementById('startSessionBtn');
+                const endSessionBtn = document.getElementById('endSessionBtn');
+
+                document.getElementById('avgWeight').textContent = data.stats.averageWeight.toFixed(3);
+                document.getElementById('stdDev').textContent = data.stats.standardDeviation.toFixed(3);
+                document.getElementById('minWeight').textContent = data.stats.minWeight.toFixed(3);
+                document.getElementById('maxWeight').textContent = data.stats.maxWeight.toFixed(3);
+                document.getElementById('totalMeasurements').textContent = data.stats.totalMeasurements;
+                document.getElementById('sessionMeasurements').textContent = sessionMeasurements;
+                // Update session statistics title with total bullets reloaded
+                document.getElementById('sessionStatsTitle').textContent = `📊 Session Statistics (Total: ${data.stats.totalMeasurements} bullets)`;
+
+                // Manage Start/End Session button state
+                if (sessionMeasurements > 0) {
+                    startSessionBtn.setAttribute('disabled', 'disabled');
+                    endSessionBtn.removeAttribute('disabled');
+                } else {
+                    startSessionBtn.removeAttribute('disabled');
+                    endSessionBtn.setAttribute('disabled', 'disabled');
+                }
+            }
+            
+            // Update status indicators
+            updateStatusIndicator('systemStatus', true);
+            updateStatusIndicator('wifiStatus', data.wifiConnected);
+            updateStatusIndicator('sensorStatus', true);
+            
+            // Update alarm status and calibration state in the info panel
+            currentCalState = data.calibrationState || 0; // <--- This line is key!
+            updateInfoPanel(data.alarmActive, currentCalState);
+            
+            // Update chart data
+            if (data.recentMeasurements) {
+                updateChart(data.recentMeasurements);
+            }
+            
+            // Update recent measurements table
+            updateRecentMeasurementsTable(data.recentMeasurements);
+
+            // Update session logs table
+            updateSessionLogsTable(data.sessionLogs);
+
+            // Update system info
+            document.getElementById('freeMemory').textContent = (data.freeHeap / 1024).toFixed(0) + ' KB';
+            document.getElementById('wifiSignal').textContent = data.rssi + ' dBm';
+            document.getElementById('ipAddress').textContent = data.ipAddress;
+
+
+            // Update quick settings (now config dropdown)
+            if (data.powderConfigs) {
+                const configSelect = document.getElementById('configSelect');
+                // const currentVal = configSelect.value; // Preserve selection during update
+                configSelect.innerHTML = '<option value="-1">-- No Configuration --</option>'; // Reset
+                data.powderConfigs.forEach((config, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = config.name;
+                    configSelect.appendChild(option);
+                });
+                // Restore selection if it still exists, otherwise use from data
+                const newIndex = data.currentConfigIndex !== undefined ? data.currentConfigIndex : -1;
+                configSelect.value = newIndex;
+            }
+
+            // Re-added lowThreshold update
+            if (data.lowThreshold !== undefined) {
+                document.getElementById('lowThreshold').value = data.lowThreshold.toFixed(1);
+            }
+            if (data.highThreshold !== undefined) {
+                document.getElementById('highThreshold').value = data.highThreshold.toFixed(1);
+            }
+
+            // Update calibration UI (buttons, messages within the calibration content)
+            updateCalibrateUI();
+
+            // Enable/disable measure button based on stability and calibration state
+            const measureButton = document.getElementById('measureButton');
+            if (data.isStable && data.calibrationState == 0) { // Disable during calibration
+                measureButton.removeAttribute('disabled');
+            } else {
+                measureButton.setAttribute('disabled', 'disabled');
+            }
+        }
+
+        // Update status indicators
+        function updateStatusIndicator(elementId, status) {
+            const indicator = document.getElementById(elementId);
+            if (status) {
+                indicator.className = 'status-indicator';
+            } else {
+                indicator.className = 'status-indicator error';
+            }
+        }
+
+        // Update connection status display
+        function updateConnectionStatus() {
+            const indicator = document.getElementById('connectionIndicator');
+            const textElement = document.getElementById('connectionStatusText');
+            
+            if (isConnected) {
+                indicator.className = 'status-indicator'; // Default green
+                textElement.innerHTML = 'Connected';
+            } else {
+                indicator.className = 'status-indicator error'; // Red
+                textElement.innerHTML = 'Disconnected';
+            }
+        }
+
+        // Update uptime display
+        function updateUptime() {
+            // This would be updated with actual uptime from the device
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('uptimeDisplay').textContent = `Time: ${timeString}`;
+        }
+
+        // Chart management - Line chart for up to 100 measurements with improved readability
+        function updateChart(measurements) {
+            if (!measurements || measurements.length === 0) {
+                document.getElementById('chartPlaceholder').textContent = 'No measurements yet';
+                return;
+            }
+
+            const chartPlaceholder = document.getElementById('chartPlaceholder');
+            const measurementChart = document.getElementById('measurementChart');
+            const ctx = measurementChart.getContext('2d');
+
+            // Hide placeholder and show canvas
+            chartPlaceholder.style.display = 'none';
+            measurementChart.style.display = 'block';
+
+            // Clear canvas
+            ctx.clearRect(0, 0, measurementChart.width, measurementChart.height);
+
+            // Set canvas size to match container exactly
+            const container = measurementChart.parentElement;
+            measurementChart.width = container.clientWidth;
+            measurementChart.height = container.clientHeight;
+
+            const width = measurementChart.width;
+            const height = measurementChart.height;
+            const padding = 40; // Reduced padding to fit in container
+            const plotWidth = width - 2 * padding;
+            const plotHeight = height - 2 * padding;
+
+            // Show all measurements (up to 100)
+            const displayMeasurements = measurements;
+            const weights = displayMeasurements.map(m => m.weight);
+            
+            const lowThreshold = parseFloat(document.getElementById('lowThreshold').value);
+            const highThreshold = parseFloat(document.getElementById('highThreshold').value);
+
+            let minWeight, maxWeight;
+
+            if (!isNaN(lowThreshold) && !isNaN(highThreshold) && lowThreshold < highThreshold) {
+                // Use exact threshold values from quick settings - no buffer
+                minWeight = lowThreshold;
+                maxWeight = highThreshold;
+            } else {
+                // Default mode: Set range based on data min/max - no buffer
+                maxWeight = Math.max(...weights, 1);
+                minWeight = Math.min(...weights, 0);
+            }
+
+            // Draw background
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(padding, padding, plotWidth, plotHeight);
+
+            // Draw grid lines (more granular)
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                const y = padding + (plotHeight * i) / 10;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+            }
+
+            // Draw axes
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.stroke();
+
+            // Draw low and high threshold lines from quick settings (FIRST, so they appear behind data)
+            if (!isNaN(lowThreshold) && lowThreshold >= minWeight && lowThreshold <= maxWeight) {
+                const lowY = height - padding - ((lowThreshold - minWeight) / (maxWeight - minWeight)) * plotHeight;
+                ctx.strokeStyle = '#e74c3c'; // Red for low threshold
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(padding, lowY);
+                ctx.lineTo(width - padding, lowY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#e74c3c';
+                ctx.font = 'bold 11px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(`LOW: ${lowThreshold.toFixed(3)}gr`, padding + 5, lowY - 5);
+            }
+
+            if (!isNaN(highThreshold) && highThreshold >= minWeight && highThreshold <= maxWeight) {
+                const highY = height - padding - ((highThreshold - minWeight) / (maxWeight - minWeight)) * plotHeight;
+                ctx.strokeStyle = '#e74c3c'; // Red for high threshold
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(padding, highY);
+                ctx.lineTo(width - padding, highY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#e74c3c';
+                ctx.font = 'bold 11px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(`HIGH: ${highThreshold.toFixed(3)}gr`, padding + 5, highY + 12);
+            }
+
+            // Draw target line if config available
+            if (displayMeasurements[0] && displayMeasurements[0].config && displayMeasurements[0].config.targetGrain !== undefined) {
+                const target = displayMeasurements[0].config.targetGrain;
+                if (target >= minWeight && target <= maxWeight) {
+                    const targetY = height - padding - ((target - minWeight) / (maxWeight - minWeight)) * plotHeight;
+                    ctx.strokeStyle = '#f39c12';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([3, 3]);
+                    ctx.beginPath();
+                    ctx.moveTo(padding, targetY);
+                    ctx.lineTo(width - padding, targetY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                    ctx.fillStyle = '#f39c12';
+                    ctx.font = 'bold 11px Arial';
+                    ctx.textAlign = 'right';
+                    ctx.fillText(`TARGET: ${target.toFixed(3)}gr`, width - padding - 5, targetY - 5);
+                }
+            }
+
+            // Draw line chart with all data points
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            displayMeasurements.forEach((m, index) => {
+                const x = padding + (index / Math.max(displayMeasurements.length - 1, 1)) * plotWidth;
+                const y = height - padding - ((m.weight - minWeight) / (maxWeight - minWeight)) * plotHeight;
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+
+            // Draw data points (smaller for many points, larger for few)
+            const pointRadius = displayMeasurements.length > 50 ? 2 : 3;
+            ctx.fillStyle = '#3498db';
+            displayMeasurements.forEach((m, index) => {
+                const x = padding + (index / Math.max(displayMeasurements.length - 1, 1)) * plotWidth;
+                const y = height - padding - ((m.weight - minWeight) / (maxWeight - minWeight)) * plotHeight;
+                ctx.beginPath();
+                ctx.arc(x, y, pointRadius, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+
+            // Draw labels
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Measurements (${displayMeasurements.length} points)`, width / 2, height - 10);
+
+            // Draw Y-axis label
+            ctx.save();
+            ctx.translate(15, height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.font = 'bold 12px Arial';
+            ctx.fillText('Weight (grains)', 0, 0);
+            ctx.restore();
+
+            // Draw Y-axis values with better spacing
+            ctx.textAlign = 'right';
+            ctx.font = '11px Arial';
+            for (let i = 0; i <= 10; i++) {
+                const value = minWeight + ((maxWeight - minWeight) * i) / 10;
+                const y = height - padding - (plotHeight * i) / 10;
+                ctx.fillText(value.toFixed(2), padding - 8, y + 4);
+            }
+
+            // Draw X-axis label
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 12px Arial';
+            ctx.fillText('Measurement Sequence', width / 2, height - 25);
+        }
+
+        // Update recent measurements table
+        function updateRecentMeasurementsTable(measurements) {
+            if (!measurements || measurements.length === 0) {
+                document.querySelector('#recentMeasurements tbody').innerHTML = '<tr><td colspan="4">No measurements yet</td></tr>';
+                document.getElementById('lastMeasurementDetails').innerHTML = '<p>No measurements yet</p>';
+                return;
+            }
+
+            const tbody = document.querySelector('#recentMeasurements tbody');
+            tbody.innerHTML = '';
+
+            // The data from ESP32 is all measurements in the session.
+            // We reverse it to show newest first.
+            const recent = measurements.slice().reverse();
+            recent.forEach(measurement => {
+                const row = tbody.insertRow();
+                // Assuming timestamp is seconds since epoch, convert to milliseconds
+                const time = new Date(measurement.timestamp * 1000).toLocaleTimeString('nl-NL');
+                const weight = measurement.weight.toFixed(3); // Use 3 decimal places for precision
+
+                // Determine status based on thresholds
+                const highThreshold = parseFloat(document.getElementById('highThreshold').value);
+                const lowThreshold = parseFloat(document.getElementById('lowThreshold').value);
+
+                let status = 'OK';
+                if (weight < lowThreshold) {
+                    status = 'LOW';
+                } else if (weight > highThreshold) {
+                    status = 'HIGH';
+                }
+
+                let configCell = '<td>N/A</td>';
+                if (measurement.config) {
+                    const config = measurement.config;
+                    const title = `Caliber: ${config.caliber}\nBullet: ${config.bulletWeight}\nPowder: ${config.powderName}\nTarget: ${config.targetGrain.toFixed(2)}gr`;
+                    configCell = `<td title="${title}">${config.name}</td>`;
+                }
+
+                row.innerHTML = `
+                    <td>${time}</td>
+                    <td>${weight}</td>
+                    ${configCell}
+                    <td>${status}</td>
+                `;
+            });
+
+            // Update last measurement details
+            const lastMeasurement = recent[0]; // Newest first, so index 0
+            const time = new Date(lastMeasurement.timestamp * 1000).toLocaleString('nl-NL');
+            const weight = lastMeasurement.weight.toFixed(3);
+            const highThreshold = parseFloat(document.getElementById('highThreshold').value);
+            const lowThreshold = parseFloat(document.getElementById('lowThreshold').value);
+
+            let status = 'OK';
+            if (weight < lowThreshold) {
+                status = 'LOW';
+            } else if (weight > highThreshold) {
+                status = 'HIGH';
+            }
+
+            let configDetails = 'No Configuration';
+            if (lastMeasurement.config) {
+                const config = lastMeasurement.config;
+                configDetails = `${config.name} (Target: ${config.targetGrain.toFixed(3)}gr)`;
+            }
+
+            document.getElementById('lastMeasurementDetails').innerHTML = `
+                <p><strong>Time:</strong> ${time}</p>
+                <p style="font-size: 1.5em;"><strong>Weight:</strong> ${weight} gr</p>
+                <p><strong>Configuration:</strong> ${configDetails}</p>
+                <p><strong>Status:</strong> ${status}</p>
+            `;
+        }
+
+        // Update session logs table
+        function updateSessionLogsTable(sessionLogs) {
+            if (!sessionLogs || sessionLogs.length === 0) {
+                document.querySelector('#sessionLogsTable tbody').innerHTML = '<tr><td colspan="5">No sessions yet</td></tr>';
+                return;
+            }
+
+            const tbody = document.querySelector('#sessionLogsTable tbody');
+            tbody.innerHTML = '';
+
+            // Show sessions in reverse order (newest first)
+            const logs = sessionLogs.slice().reverse();
+            logs.forEach((log, index) => {
+                const row = tbody.insertRow();
+                // Calculate the original index in the sessionLogs array (since we reversed it for display)
+                const originalIndex = sessionLogs.length - 1 - index; 
+                
+                const startDate = new Date(log.startTime).toLocaleDateString('nl-NL');
+                const duration = Math.round((log.endTime - log.startTime) / 1000 / 60); // Duration in minutes
+                row.innerHTML = `
+                    <td>${startDate}</td>
+                    <td>${log.bulletCount}</td>
+                    <td>${log.totalWeight.toFixed(3)}</td>
+                    <td>${duration} min</td>
+                    <td><button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.75em;" onclick="exportSessionDetails(${originalIndex})">Export</button></td>
+                `;
+            });
+        }
+
+        // Function to show temporary notification
+        function showNotification(message, type = 'info', duration = 3000) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification show ${type}`; // Add type for potential styling
+            clearTimeout(notificationTimeout);
+            notificationTimeout = setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration); // Notification disappears after specified duration
+        }
+
+        // New function to manage the combined info panel
+        function updateInfoPanel(alarmActive, calibrationState) {
+            const infoPanel = document.getElementById('infoPanel');
+            // const alarmContent = document.getElementById('alarmContent'); // Removed
+            const calibrationContent = document.getElementById('calibrationContent');
+
+            // Hide both contents by default
+            // alarmContent.style.display = 'none'; // Removed
+            calibrationContent.style.display = 'none';
+            infoPanel.classList.remove('active', 'alarm', 'calibration');
+
+            if (calibrationState !== 0) { // If calibration is active
+                infoPanel.classList.add('active', 'calibration');
+                calibrationContent.style.display = 'block';
+            } 
+            // Removed else if (alarmActive) block
+        }
+
+        // Update calibration UI based on state (now only manages content within calibrationContent)
+        function updateCalibrateUI() {
+            const calibrationMessage = document.getElementById('calibrationMessage');
+            const calibratingConfigName = document.getElementById('calibratingConfigName');
+            const calibrationStepButton = document.getElementById('calibrationStepButton');
+            const knownGrainsInputGroup = document.getElementById('knownGrainsInputGroup');
+            const calibrateButtonMain = document.getElementById('calibrateButton');
+            const cancelCalibrateButtonMain = document.getElementById('cancelCalibrateButton');
+
+            // Manage visibility of main calibrate/cancel buttons
+            if (currentCalState === 0) { // CALIBRATE_NONE
+                calibrateButtonMain.style.display = 'inline-block';
+                cancelCalibrateButtonMain.style.display = 'none';
+                calibratingConfigName.style.display = 'none';
+            } else {
+                calibrateButtonMain.style.display = 'none';
+                cancelCalibrateButtonMain.style.display = 'inline-block';
+
+                if (window.currentState.currentConfig) {
+                    calibratingConfigName.textContent = `Calibrating: ${window.currentState.currentConfig.name}`;
+                    calibratingConfigName.style.display = 'block';
+                }
+
+                if (currentCalState === 1) { // CALIBRATE_ZERO_STEP
+                    calibrationMessage.innerHTML = '<strong>Step 1/2: Set Zero Point</strong><br>Place the probe at its zero (empty) position and click "Set Zero".'; // Changed to 2 steps
+                    calibrationStepButton.textContent = 'Set Zero';
+                    calibrationStepButton.onclick = () => sendCommand('calibrate', {step: 'setZeroPoint'});
+                    knownGrainsInputGroup.style.display = 'none';
+                } else if (currentCalState === 2) { // CALIBRATE_KNOWN_GRAINS_STEP (now Step 2)
+                    calibrationMessage.innerHTML = '<strong>Step 2/2: Set Known Grains</strong><br>Insert the probe into a shell with a <strong>precisely known amount of powder</strong>. Enter the known weight below and click "Set Known Grains".'; // Changed to 2 steps
+                    calibrationStepButton.textContent = 'Set Known Grains';
+                    calibrationStepButton.onclick = () => {
+                        const knownGrains = parseFloat(document.getElementById('knownGrains').value);
+                        if (isNaN(knownGrains) || knownGrains <= 0) {
+                            showNotification('Please enter a valid positive number for known grains.', 'error');
+                            return;
+                        }
+                        sendCommand('calibrate', {step: 'setKnownGrains', knownWeight: knownGrains});
+                    };
+                    knownGrainsInputGroup.style.display = 'block';
+                }
+            }
+        }
+
+        // Control functions
+        function sendCommand(command, data = {}) {
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                const message = { command, ...data };
+                websocket.send(JSON.stringify(message));
+                console.log('Sent command:', message);
+                showNotification(`Command sent: ${command}`, 'info');
+            } else {
+                showNotification('Not connected to device. Please refresh the page.', 'error');
+                console.error('WebSocket not open. ReadyState:', websocket ? websocket.readyState : 'null');
+            }
+        }
+
+        function zeroSensor() {
+            sendCommand('zero');
+        }
+
+        function takeMeasurement() {
+            sendCommand('measure');
+        }
+
+        function startCalibrationWizard() {
+            sendCommand('calibrate', {step: 'startWizard'});
+        }
+
+        function handleCalibrationStep() {
+            // This function is now dynamically assigned by updateCalibrateUI
+        }
+
+        function cancelCalibration() {
+            sendCommand('calibrate', {step: 'cancel'});
+        }
+
+        function cancelCalibrate() {
+            cancelCalibration();
+        }
+
+        // --- Config Management Functions ---
+        function openConfigModal(isEdit = false) {
+            const modal = document.getElementById('configModal');
+            const form = document.getElementById('configForm');
+            form.reset(); // Clear previous entries
+
+            const selectedIndex = document.getElementById('configSelect').value;
+
+            if (isEdit) {
+                if (selectedIndex < 0) {
+                    showNotification('Please select a configuration to edit.', 'warning');
+                    return;
+                }
+                // Fetch the full data for the selected config to populate the form
+                if (window.currentState && window.currentState.powderConfigs) {
+                    const config = window.currentState.powderConfigs[selectedIndex];
+                    document.getElementById('configModalTitle').textContent = 'Edit Configuration';
+                    document.getElementById('configIndex').value = selectedIndex;
+                    document.getElementById('configName').value = config.name;
+                    document.getElementById('configCaliber').value = config.caliber;
+                    document.getElementById('configBulletWeight').value = config.bulletWeight;
+                    document.getElementById('configPowderName').value = config.powderName;
+                    document.getElementById('configTargetGrain').value = config.targetGrain;
+                } else {
+                    showNotification('Could not load config data. Please wait for data refresh.', 'error');
+                    return;
+                }
+            } else {
+                document.getElementById('configModalTitle').textContent = 'Add New Configuration';
+                // The index for a new config will be the current count of configs
+                const newIndex = window.currentState.powderConfigs ? window.currentState.powderConfigs.length : 0;
+                document.getElementById('configIndex').value = newIndex;
+            }
+
+            modal.style.display = 'block';
+        }
+
+        function closeConfigModal() {
+            document.getElementById('configModal').style.display = 'none';
+        }
+
+        function saveConfig() {
+            const configData = {
+                index: parseInt(document.getElementById('configIndex').value),
+                name: document.getElementById('configName').value,
+                caliber: document.getElementById('configCaliber').value,
+                bulletWeight: document.getElementById('configBulletWeight').value,
+                powderName: document.getElementById('configPowderName').value,
+                targetGrain: parseFloat(document.getElementById('configTargetGrain').value)
+            };
+
+            if (!configData.name || !configData.caliber || !configData.bulletWeight || !configData.powderName || isNaN(configData.targetGrain)) {
+                showNotification('Please fill all fields with valid data.', 'error');
+                return;
+            }
+
+            sendCommand('saveConfig', { data: configData });
+            closeConfigModal();
+        }
+
+        function selectConfig() {
+            const select = document.getElementById('configSelect');
+            const selectedIndex = parseInt(select.value);
+            if (window.currentState && window.currentState.powderConfigs && window.currentState.powderConfigs[selectedIndex]) {
+                const target = window.currentState.powderConfigs[selectedIndex].targetGrain;
+                document.getElementById('lowThreshold').value = (target - 0.5).toFixed(1);
+                document.getElementById('highThreshold').value = (target + 0.5).toFixed(1);
+            }
+            sendCommand('selectConfig', { index: selectedIndex });
+        }
+
+        function deleteConfig() {
+            const select = document.getElementById('configSelect');
+            const selectedIndex = parseInt(select.value);
+            if (selectedIndex < 0) {
+                showNotification('Please select a configuration to delete.', 'warning');
+                return;
+            }
+            if (confirm(`Are you sure you want to delete the configuration "${select.options[select.selectedIndex].text}"?`)) {
+                sendCommand('deleteConfig', { index: selectedIndex });
+            }
+        }
+
+        function exportConfigs() {
+            if (!window.currentState || !window.currentState.powderConfigs) {
+                showNotification('No configurations to export.', 'warning');
+                return;
+            }
+            const dataStr = JSON.stringify(window.currentState.powderConfigs, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = 'powdersense_configs.json';
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            showNotification('Configurations exported.', 'info');
+        }
+
+        function importConfigs() {
+            const fileInput = document.getElementById('importConfigsInput');
+            const file = fileInput.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const configs = JSON.parse(e.target.result);
+                    if (!Array.isArray(configs)) throw new Error('Invalid format');
+                    sendCommand('importConfigs', { configs: configs });
+                    showNotification('Importing configurations...', 'info');
+                } catch (error) {
+                    showNotification('Failed to import configurations: ' + error.message, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function updateThresholds() {
+            const low = parseFloat(document.getElementById('lowThreshold').value);
+            const high = parseFloat(document.getElementById('highThreshold').value);
+            
+            if (isNaN(low) || isNaN(high)) {
+                showNotification('Invalid threshold values.', 'error');
+                return;
+            }
+
+            // Assuming alarms are always enabled when thresholds are set via quick settings
+            sendCommand('setAlarms', { 
+                enabled: true, 
+                lowThreshold: low, 
+                highThreshold: high 
+            });
+        }
+
+        function acknowledgeAlarm() {
+            sendCommand('acknowledgeAlarm');
+        }
+
+        function resetSession() {
+            if (confirm('Reset session statistics? This cannot be undone.')) {
+                sendCommand('resetSession');
+            }
+        }
+
+        function startSession() {
+            console.log('Start Session button clicked');
+            sendCommand('startSession');
+            showNotification('Session started', 'info');
+        }
+
+        function endSession() {
+            console.log('End Session button clicked');
+            sendCommand('endSession');
+            showNotification('Session ended', 'info');
+        }
+
+        function exportData() {
+            // This will trigger a download from the ESP32
+            window.open('/api/export?format=csv', '_blank');
+            showNotification('Exporting data...', 'info');
+        }
+
+        function exportSessionLogs() {
+            if (!window.currentState || !window.currentState.sessionLogs || window.currentState.sessionLogs.length === 0) {
+                showNotification('No session logs to export.', 'warning');
+                return;
+            }
+            
+            let csv = 'Date,Start Time,End Time,Bullets,Total Weight (gr),Duration (min)\n';
+            window.currentState.sessionLogs.forEach(log => {
+                const startDate = new Date(log.startTime * 1000);
+                const endDate = new Date(log.endTime * 1000);
+                const duration = Math.round((log.endTime - log.startTime) / 60);
+                
+                csv += `"${startDate.toLocaleDateString('nl-NL')}","${startDate.toLocaleTimeString('nl-NL')}","${endDate.toLocaleTimeString('nl-NL')}",${log.bulletCount},${log.totalWeight.toFixed(3)},${duration}\n`;
+            });
+            
+            const dataUri = 'data:text/csv;charset=utf-8,'+ encodeURIComponent(csv);
+            const exportFileDefaultName = 'powdersense_session_logs.csv';
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            showNotification('Session logs exported.', 'info');
+        }
+
+        function exportSessionDetails(logIndex) {
+            const log = window.currentState.sessionLogs[logIndex];
+            if (!log) {
+                showNotification('Session log not found.', 'error');
+                return;
+            }
+
+            const startDate = new Date(log.startTime * 1000);
+            const endDate = new Date(log.endTime * 1000);
+            
+            // Create CSV with detailed measurements from this session
+            let csv = 'Timestamp,Weight(grains),Config Name,Caliber,Bullet Weight,Powder Name,Target Grain\n';
+            
+            // Export all measurements that fall within this session's time range
+            if (window.currentState.recentMeasurements) {
+                window.currentState.recentMeasurements.forEach(measurement => {
+                    // Check if measurement is within session time range
+                    if (measurement.timestamp >= log.startTime && measurement.timestamp <= log.endTime) {
+                        csv += `${measurement.timestamp},${measurement.weight.toFixed(3)}`;
+                        if (measurement.config) {
+                            csv += `,${measurement.config.name},${measurement.config.caliber},${measurement.config.bulletWeight},${measurement.config.powderName},${measurement.config.targetGrain.toFixed(3)}`;
+                        } else {
+                            csv += `,,,,,`;
+                        }
+                        csv += '\n';
+                    }
+                });
+            }
+            
+            const dataUri = 'data:text/csv;charset=utf-8,'+ encodeURIComponent(csv);
+            const exportFileDefaultName = `powdersense_session_${startDate.toISOString().split('T')[0]}_${startDate.getHours()}-${startDate.getMinutes()}.csv`;
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            showNotification('Session exported successfully.', 'success');
+        }
+
+        function downloadLogs() {
+            showNotification('Log download feature coming soon', 'info');
+        }
+
+        function updateFirmware() {
+            // Trigger file input for firmware update
+            document.getElementById('firmwareUpdateInput').click();
+        }
+
+        function handleFirmwareUpdate() {
+            const fileInput = document.getElementById('firmwareUpdateInput');
+            const file = fileInput.files[0];
+            if (!file) return;
+            if (!file.name.endsWith('.bin')) {
+                showNotification('Please select a valid .bin firmware file.', 'error');
+                return;
+            }
+            uploadUpdate(file, 'firmware');
+        }
+
+        function handleFilesystemUpdate() {
+            const fileInput = document.getElementById('filesystemUpdateInput');
+            const file = fileInput.files[0];
+            if (!file) return;
+            if (!file.name.endsWith('.bin')) {
+                showNotification('Please select a valid .bin filesystem file.', 'error');
+                return;
+            }
+            uploadUpdate(file, 'filesystem');
+        }
+
+        function uploadUpdate(file, type) {
+            const progressDiv = document.getElementById('updateProgress');
+            const progressBar = document.getElementById('progressBar');
+            const progressText = document.getElementById('progressText');
+            progressDiv.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressText.textContent = 'Preparing upload...';
+
+            const reader = new FileReader();
+            reader.onloadstart = function() {
+                progressText.textContent = 'Reading file...';
+            };
+            reader.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percent = (e.loaded / e.total) * 50; // First 50% for reading
+                    progressBar.style.width = percent + '%';
+                }
+            };
+            reader.onload = function(e) {
+                const arrayBuffer = e.target.result;
+                progressText.textContent = 'Sending to device...';
+                if (websocket && websocket.readyState === WebSocket.OPEN) {
+                    // Send command first
+                    websocket.send(JSON.stringify({ command: 'updateFirmware', type: type, filename: file.name, size: arrayBuffer.byteLength }));
+                    // Then send binary data
+                    setTimeout(() => {
+                        websocket.send(arrayBuffer);
+                        progressBar.style.width = '100%';
+                        progressText.textContent = 'Upload complete. Waiting for device response...';
+                        // Hide progress after 10 seconds or on reconnect
+                        setTimeout(() => {
+                            progressDiv.style.display = 'none';
+                        }, 10000);
+                    }, 500);
+                    showNotification(`Uploading ${type} update...`, 'info');
+                } else {
+                    progressDiv.style.display = 'none';
+                    showNotification('Not connected to device.', 'error');
+                }
+            };
+            reader.onerror = function() {
+                progressDiv.style.display = 'none';
+                showNotification('Error reading file.', 'error');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+
+        function factoryReset() {
+            if (confirm('Factory reset will erase all settings and data. Continue?')) {
+                sendCommand('factoryReset');
+            }
+        }
+
+        function handleUpdateStatus(status) {
+            const progressDiv = document.getElementById('updateProgress');
+            const progressText = document.getElementById('progressText');
+            if (status === 'started') {
+                progressText.textContent = 'Update started on device...';
+            } else if (status === 'progress') {
+                // Assuming status includes percent, e.g., {status: 'progress', percent: 50}
+                if (status.percent !== undefined) {
+                    document.getElementById('progressBar').style.width = status.percent + '%';
+                    progressText.textContent = `Updating... ${status.percent}%`;
+                }
+            } else if (status === 'success') {
+                progressText.textContent = 'Update successful! Device will reboot.';
+                setTimeout(() => {
+                    progressDiv.style.display = 'none';
+                    showNotification('Firmware updated successfully. Device rebooting...', 'success');
+                }, 2000);
+            } else if (status === 'error') {
+                progressDiv.style.display = 'none';
+                showNotification('Update failed: ' + (status.message || 'Unknown error'), 'error');
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey) {
+                switch(event.key) {
+                    case 'z': // Ctrl+Z for Zero
+                        event.preventDefault();
+                        zeroSensor();
+                        break;
+                    case 'm': // Ctrl+M for Measure
+                        event.preventDefault();
+                        // Only allow if button is not disabled
+                        if (!document.getElementById('measureButton').hasAttribute('disabled')) {
+                            takeMeasurement();
+                        } else {
+                            showNotification('Measurement not stable yet!', 'warning');
+                        }
+                        break;
+                    case 'r': // Ctrl+R for Reset Session
+                        event.preventDefault();
+                        resetSession();
+                        break;
+                    case 'a': // Ctrl+A for Acknowledge Alarm
+                        event.preventDefault();
+                        acknowledgeAlarm();
+                        break;
+                    case 'c': // Ctrl+C for Calibrate
+                        event.preventDefault();
+                        startCalibrationWizard();
+                        break;
+                }
+            }
+        });
+
+        // Auto-refresh data every 5 seconds as fallback (only if WebSocket is disconnected)
+        // This fallback is less relevant now with WebSocket, but kept for robustness
+        setInterval(function() {
+            if (!isConnected) {
+                // This API endpoint needs to be implemented on ESP32
+                fetch('/depth') 
+                    .then(response => response.json())
+                    .then(data => {
+                        updateDashboard(data);
+                    })
+                    .catch(error => {
+                        console.log('Fallback data fetch failed:', error);
+                    });
+            }
+        }, 5000);
+
+        // Function to generate config name
+        function generateConfigName() {
+            const caliber = document.getElementById('configCaliber').value.trim();
+            const bulletWeight = document.getElementById('configBulletWeight').value.trim();
+            const powderName = document.getElementById('configPowderName').value.trim();
+            const configNameInput = document.getElementById('configName');
+
+            let generatedName = '';
+            if (caliber) {
+                generatedName += caliber;
+            }
+            if (bulletWeight) {
+                generatedName += (generatedName ? ' ' : '') + bulletWeight;
+            }
+            if (powderName) {
+                generatedName += (generatedName ? ' ' : '') + powderName;
+            }
+
+            configNameInput.value = generatedName;
+        }
+    </script>
+    <!-- Chart functionality now uses built-in canvas drawing, no external library needed -->
+</body>
+</html>

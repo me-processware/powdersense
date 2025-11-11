@@ -1,0 +1,6 @@
+# This is a placeholder file.
+# Please download the Arduino_GFX library from GitHub:
+# https://github.com/moononournation/Arduino_GFX
+#
+# Unzip it, and copy the contents of the 'Arduino_GFX-master' folder
+# (e.g., src, library.properties, etc.) into this directory.
