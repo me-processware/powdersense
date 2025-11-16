@@ -300,6 +300,9 @@ The web interface is divided into several tabs:
 
 ### Dashboard Tab
 
+![Main Dashboard](images/software/main_dashboard.png)
+*Main dashboard showing current measurement, session statistics, and real-time chart*
+
 **Main Display**:
 - **Current Weight**: Large display of current measurement (updates 10x/second)
 - **Target Weight**: From selected profile (if any)
@@ -433,6 +436,9 @@ The web interface is divided into several tabs:
 
 **Creating a New Profile**:
 
+![Add Configuration Dialog](images/software/add_configuration.png)
+*Dialog for creating a new powder configuration profile*
+
 1. Click **"New Profile"**
 2. Fill in details:
    - **Name**: Descriptive name (e.g., ".308 Win - 168gr SMK")
@@ -445,6 +451,9 @@ The web interface is divided into several tabs:
    - **High Threshold**: Maximum acceptable weight
 4. Click **"Save"**
 5. **Calibrate** the profile (each profile has its own calibration)
+
+![Configuration Created](images/software/configuration_created.png)
+*Dashboard with active configuration (not yet calibrated)*
 
 **Using Profiles**:
 - Click profile name to activate
@@ -572,6 +581,10 @@ Calibration is **essential** for accurate measurements. It compensates for:
 **Step-by-Step** (2 minutes):
 
 **Step 1: Set Zero Point**
+
+![Calibration Step 1](images/software/calibration_step1.png)
+*Calibration wizard - Step 1: Setting the zero point*
+
 1. Navigate to **Calibration** tab in web interface
 2. Fully extend probe (no compression)
 3. Ensure no load on probe
@@ -580,6 +593,10 @@ Calibration is **essential** for accurate measurements. It compensates for:
 6. Confirmation: "Zero point set successfully"
 
 **Step 2: Set Known Reference**
+
+![Calibration Step 2](images/software/calibration_step2.png)
+*Calibration wizard - Step 2: Setting known reference weight*
+
 1. Place your pre-weighed powder charge in measure
 2. Position probe to measure depth
 3. Wait for reading to stabilize (2-3 seconds)
@@ -655,6 +672,9 @@ For maximum accuracy across full range:
 - **Stable Duration**: 750ms (default) - How long reading must be stable
 - **Tolerance**: ±0.1 grains - Acceptable variation during stable period
 - **Cooldown**: 10 seconds - Delay before next auto-measurement
+
+![Active Measurement](images/software/measurement_active.png)
+*Dashboard showing active measurement with calibrated profile and session statistics*
 
 **Workflow**:
 1. Enable auto-measure in settings
