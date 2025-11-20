@@ -57,7 +57,7 @@ This document lists all components required to build one complete PowderSense un
 
 | # | Component | Specification | Qty | Unit Price | Total | Supplier | Part Number / Link |
 |---|-----------|---------------|-----|------------|-------|----------|-------------------|
-| 4 | **Compression Spring** | 0.9mm wire × 5mm OD × 70mm length | 1 | €1.50 | €1.50 | AliExpress | [Link](https://nl.aliexpress.com/item/1005007124937621.html) |
+| 4 | **Compression Spring** | 0.9mm wire × 6mm OD × 70mm length | 1 | €1.50 | €1.50 | AliExpress | [Link](https://nl.aliexpress.com/item/1005007124937621.html) | (!! there was an error on the provided bag it stated 0.9x5x70 this is wrong and has to be 0.9x6x70 !!
 | 5 | **Slide Bearings** | 4mm bore diameter, igus XFM-0405-04 | 2 | €2.50 | €5.00 | Conrad | igus XFM-0405-04 [Link](https://www.conrad.nl/nl/p/igus-xfm-0405-04-glijlager-boordiameter-4-mm-1416628.html) |
 | 6 | **Steel Rod** | 4mm diameter × 500mm length, silver steel | 1 | €4.99 | €4.99 | Conrad | Reely 237060 [Link](https://www.conrad.nl/nl/p/zilverstalen-as-reely-o-x-l-4-mm-x-500-mm-237060.html) |
 
